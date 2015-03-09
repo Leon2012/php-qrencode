@@ -33,9 +33,7 @@
 #define QRENCODE_RESOURCE_TYPE "Qrencode"
 gdImagePtr qrcode_png(QRcode *code, int fg_color[3], int bg_color[3], int size, int margin);
 
-/* If you declare any globals in php_qrencode.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(qrencode)
-*/
 
 /* True global resources - no need for thread safety here */
 static int le_qrencode;
@@ -46,12 +44,18 @@ typedef struct _qrencode {
 
 ZEND_BEGIN_ARG_INFO(qrencode_create_arginfo, 0)
     ZEND_ARG_INFO(0, str)
+    ZEND_ARG_INFO(0, level)
+    ZEND_ARG_INFO(0, hint)
 ZEND_END_ARG_INFO()
 
 
 ZEND_BEGIN_ARG_INFO(qrencode_save_arginfo, 0)
     ZEND_ARG_INFO(0, qrencode)
     ZEND_ARG_INFO(0, path)
+
+    ZEND_ARG_INFO(0, red)
+    ZEND_ARG_INFO(0, green)
+    ZEND_ARG_INFO(0, blue)
 ZEND_END_ARG_INFO()
 
 /* {{{ qrencode_functions[]
@@ -91,15 +95,13 @@ zend_module_entry qrencode_module_entry = {
 ZEND_GET_MODULE(qrencode)
 #endif
 
-/* {{{ PHP_INI
- */
-/* Remove comments and fill if you need to have entries in php.ini
 PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("qrencode.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_qrencode_globals, qrencode_globals)
-    STD_PHP_INI_ENTRY("qrencode.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_qrencode_globals, qrencode_globals)
+    STD_PHP_INI_ENTRY("qrencode.version",      "3", PHP_INI_ALL, OnUpdateLong, version, zend_qrencode_globals, qrencode_globals)
+    STD_PHP_INI_ENTRY("qrencode.level",      "2", PHP_INI_ALL, OnUpdateLong, level, zend_qrencode_globals, qrencode_globals)
+    STD_PHP_INI_ENTRY("qrencode.hint",      "2", PHP_INI_ALL, OnUpdateLong, hint, zend_qrencode_globals, qrencode_globals)
+    STD_PHP_INI_ENTRY("qrencode.casesensitive", "1", PHP_INI_ALL, OnUpdateLong, casesensitive, zend_qrencode_globals, qrencode_globals)
 PHP_INI_END()
-*/
-/* }}} */
+
 
 /* {{{ php_qrencode_init_globals
  */
@@ -128,9 +130,22 @@ static void qrencode_dtor(zend_rsrc_list_entry *rsrc TSRMLS_DC) {
  */
 PHP_MINIT_FUNCTION(qrencode)
 {
-	/* If you have INI entries, uncomment these lines 
 	REGISTER_INI_ENTRIES();
-	*/
+
+    REGISTER_LONG_CONSTANT("QRENCODE_QRECLEVEL_L", QR_ECLEVEL_L, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_QRECLEVEL_M", QR_ECLEVEL_M, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_QRECLEVEL_Q", QR_ECLEVEL_Q, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_QRECLEVEL_H", QR_ECLEVEL_H, CONST_CS|CONST_PERSISTENT);
+
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_NUL", QR_MODE_NUL, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_NUM", QR_MODE_NUM, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_AN", QR_MODE_AN, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_8", QR_MODE_8, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_KANJI", QR_MODE_KANJI, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_STRUCTURE", QR_MODE_STRUCTURE, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_ECI", QR_MODE_ECI, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_FNC1FIRST", QR_MODE_FNC1FIRST, CONST_CS|CONST_PERSISTENT);
+    REGISTER_LONG_CONSTANT("QRENCODE_MODE_FNC1SECOND", QR_MODE_FNC1SECOND, CONST_CS|CONST_PERSISTENT);
 
     le_qrencode = zend_register_list_destructors_ex(qrencode_dtor, NULL, QRENCODE_RESOURCE_TYPE, module_number);
 
@@ -142,9 +157,8 @@ PHP_MINIT_FUNCTION(qrencode)
  */
 PHP_MSHUTDOWN_FUNCTION(qrencode)
 {
-	/* uncomment this line if you have INI entries
+
 	UNREGISTER_INI_ENTRIES();
-	*/
 	return SUCCESS;
 }
 /* }}} */
@@ -205,17 +219,33 @@ PHP_FUNCTION(qrencode_create)
     char *str;
     int str_len;
     qrencode *qe;
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s", &str, &str_len) == FAILURE) {
+
+    long level = 0;
+    long hint  = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|ll", &str, &str_len, &level, &hint) == FAILURE) {
         RETURN_NULL();
     }
 
-    int version = 3;
-    QRecLevel level = 2;
-    QRencodeMode hint = QR_MODE_8;
-    int casesensitive =1;
+    int version = (int)QRENCODE_G(version);
+    int casesensitive = (int)QRENCODE_G(casesensitive);
+    QRecLevel q_level = (int)QRENCODE_G(level);
+    QRencodeMode q_hint = (int)QRENCODE_G(hint);
 
+    if (level >= 0 && level <= 3) {
+        q_level = level;
+    }
+
+    if (hint >= QR_MODE_NUL && hint <= QR_MODE_FNC1SECOND) {
+        q_hint = hint;
+    }
     
-    QRcode *code = QRcode_encodeString(str, version, level, hint, casesensitive);
+    // php_printf("version:%d\n", version);
+    // php_printf("casesensitive:%d\n", casesensitive);
+    // php_printf("Level:%d\n", q_level);
+    // php_printf("hint:%d\n", q_hint);
+
+    QRcode *code = QRcode_encodeString(str, version, q_level, q_hint, casesensitive);
     if (code == NULL) {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "QRcode_encodeString error!!!");
         RETURN_NULL();
@@ -237,14 +267,31 @@ PHP_FUNCTION(qrencode_save)
     int path_len;
 
     int int_bg_color[3] = {255,255,255} ;
-    int int_fg_color [3] = {0,0,0};
+    
     int size = 100;
     int margin = 2;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs", &zqe, &path, &path_len) == FAILURE) {
+    int red = 0;
+    int green = 0;
+    int blue = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs|lll", &zqe, &path, &path_len, &red, &green, &blue) == FAILURE) {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "parse parameter error!!!");
         RETURN_FALSE;
     }
+
+    if (red<0 || red>255) {
+        red = 0;
+    }
+    if (green<0 || green>255) {
+        green = 0;
+    }
+    if (blue<0 || blue>255) {
+        blue = 0;
+    }
+
+    int int_fg_color [3] = {red,green,blue};
+
 
     ZEND_FETCH_RESOURCE(qe, qrencode*, &zqe, -1, QRENCODE_RESOURCE_TYPE, le_qrencode);
 

@@ -52,15 +52,14 @@ PHP_FUNCTION(qrencode_create);
 PHP_FUNCTION(qrencode_save);
 
 
-/* 
-  	Declare any global variables you may need between the BEGIN
-	and END macros here:     
+   
 
 ZEND_BEGIN_MODULE_GLOBALS(qrencode)
-	long  global_value;
-	char *global_string;
+	long  version;
+	long  level;
+  long  hint;
+  long  casesensitive;
 ZEND_END_MODULE_GLOBALS(qrencode)
-*/
 
 /* In every utility function you add that needs to use variables 
    in php_qrencode_globals, call TSRMLS_FETCH(); after declaring other 
