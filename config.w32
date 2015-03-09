@@ -1,0 +1,13 @@
+// $Id$
+// vim:ft=javascript
+
+// If your extension references something external, use ARG_WITH
+// ARG_WITH("qrencode", "for qrencode support", "no");
+
+// Otherwise, use ARG_ENABLE
+// ARG_ENABLE("qrencode", "enable qrencode support", "no");
+
+if (PHP_QRENCODE != "no") {
+	EXTENSION("qrencode", "qrencode.c");
+}
+
