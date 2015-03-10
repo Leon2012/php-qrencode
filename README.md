@@ -2,7 +2,22 @@
 
 基于libqrencode+libgd的生成二维码的php扩展
 
-用法:
+
+## 安装:
+git clone https://github.com/Leon2012/php-qrencode
+
+cd php-qrencode
+
+phpize
+
+./configure
+
+make&sudo make install
+
+vi php.ini
+
+
+## 用法:
 
 $resource = qrencode_create("test");
 
