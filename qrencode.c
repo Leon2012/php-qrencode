@@ -35,6 +35,8 @@
 
 
 #define QRENCODE_RESOURCE_TYPE "Qrencode"
+
+//fix buy main/php_compat.h
 #define gdImageCreate gdImageCreate
 #define gdImagePng gdImagePng
 #define gdImageDestroy gdImageDestroy
