@@ -22,15 +22,26 @@
 #include "config.h"
 #endif
 
+#include <gd.h>
 #include "php.h"
 #include "php_ini.h"
 #include "ext/standard/info.h"
+//#include "ext/gd/libgd/gd.h"
 #include "php_qrencode.h"
 #include <qrencode.h>
-#include <gd.h>
+
+//#include "main/php_compat.h"
+//#include "ext/gd/php_gd.h"
 
 
 #define QRENCODE_RESOURCE_TYPE "Qrencode"
+#define gdImageCreate gdImageCreate
+#define gdImagePng gdImagePng
+#define gdImageDestroy gdImageDestroy
+#define gdImageColorAllocate gdImageColorAllocate
+#define gdImageFill gdImageFill
+#define gdImageFilledRectangle gdImageFilledRectangle
+
 gdImagePtr qrcode_png(QRcode *code, int fg_color[3], int bg_color[3], int size, int margin);
 
 ZEND_DECLARE_MODULE_GLOBALS(qrencode)
