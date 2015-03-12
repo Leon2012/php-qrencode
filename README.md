@@ -16,8 +16,7 @@
 	tar zxvf qrencode-3.4.4.tar.gz
 	cd qrencode-3.4.4/
 	./configure
-
-make&make install
+	make&make install
 
 3，安装libgd
 
