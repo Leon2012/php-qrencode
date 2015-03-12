@@ -5,7 +5,13 @@
 
 ## 安装:
 
-1，安装libqrencode
+1，安装libpng & libjpg
+
+sudo apt-get install libpng-dev
+
+sudo apt-get install libjpg-dev
+
+2，安装libqrencode
 
 wget http://fukuchi.org/works/qrencode/qrencode-3.4.4.tar.gz
 
@@ -17,11 +23,11 @@ cd qrencode-3.4.4/
 
 make&make install
 
-2，安装libgd
+3，安装libgd
 
 sudo apt-get install libgd-dev
 
-3，安装php-qrencode
+4，安装php-qrencode
 
 git clone https://github.com/Leon2012/php-qrencode
 
@@ -33,9 +39,11 @@ phpize
 
 make&sudo make install
 
-4，修改配置文件
+5，修改配置文件
 
 vi php.ini
+
+extension=qrencode.so
 
 
 ## 用法:
