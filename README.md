@@ -8,7 +8,7 @@
 1，安装libpng & libjpg
 
 	sudo apt-get install libpng-dev
-	sudo apt-get install libjpg-dev
+	sudo apt-get install libjpeg-dev
 
 2，安装libqrencode
 
@@ -37,9 +37,11 @@
 
 ## 用法:
 	<?php
-	$resource = qrencode_create("test");
-	qrencode_save($resource, "/Users/kentchen/Downloads/t3.png");//保存文件
-	echo qrencode_version()."\n";//查看版本号
+	$resource = qrencode_create("test", 2, 2);
+	if (!is_null($resource)){
+		qrencode_save($resource, "./test.png");//保存文件
+	}
+	//echo qrencode_version()."\n";//查看版本号
 	?>
 	
 ## 和phpqrcode对比
