@@ -288,7 +288,7 @@ PHP_FUNCTION(qrencode_save)
     int green = 0;
     int blue = 0;
 
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs|lll", &zqe, &path, &path_len, &red, &green, &blue) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "rs|llll", &zqe, &path, &path_len, &size, &red, &green, &blue) == FAILURE) {
         php_error_docref(NULL TSRMLS_CC, E_WARNING, "parse parameter error!!!");
         RETURN_FALSE;
     }
