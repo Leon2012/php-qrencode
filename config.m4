@@ -1,15 +1,15 @@
-PHP_ARG_WITH(qrencode, for qrencode support,
- [  --with-qrencode             Include qrencode support])
+PHP_ARG_WITH(qrencode_dir, for qrencode support,
+ [  --with-qrencode-dir=[DIR]             Include qrencode support])
 
 
 PHP_ARG_ENABLE(qrencode, whether to enable qrencode support,
  [  --enable-qrencode           Enable qrencode support])
 
-if test "$PHP_QRENCODE" != "no"; then
+if test "$PHP_QRENCODE_DIR" != "no"; then
    SEARCH_PATH="/usr/local /usr"     
    SEARCH_FOR="/include/qrencode.h"  
-   if test -r $PHP_QRENCODE/$SEARCH_FOR; then # path given as parameter
-     QRENCODE_DIR=$PHP_QRENCODE
+   if test -r $PHP_QRENCODE_DIR/$SEARCH_FOR; then # path given as parameter
+     QRENCODE_DIR=$PHP_QRENCODE_DIR
    else 
      AC_MSG_CHECKING([for qrencode files in default path])
      for i in $SEARCH_PATH ; do
