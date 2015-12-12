@@ -39,9 +39,11 @@
 	<?php
 	$resource = qrencode_create("test", 2, 2);
 	if (!is_null($resource)){
-		qrencode_save($resource, "./test.png");//保存文件
+		//qrencode_save($resource, "./test.png");//保存文件
+		qrencode_output($resource);//直接输出到浏览器
 	}
-	//echo qrencode_version()."\n";//查看版本号
+	echo qrencode_version()."\n";//查看版本号
+
 	?>
 	
 ## 和phpqrcode对比

@@ -50,7 +50,7 @@ PHP_MINFO_FUNCTION(qrencode);
 PHP_FUNCTION(qrencode_version);
 PHP_FUNCTION(qrencode_create);
 PHP_FUNCTION(qrencode_save);
-
+PHP_FUNCTION(qrencode_output);
 
    
 
